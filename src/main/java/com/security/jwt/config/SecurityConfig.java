@@ -17,17 +17,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .authorizeRequests()  // 권한요청 처리 설정 메서드
-                .requestMatchers("/api/hello").permitAll()  // 접속 허용
-                .anyRequest().authenticated()
-            .and()
-                .headers().frameOptions().disable()  // X-Frame-Options in Spring Security 중지
-            .and()
-                .csrf()  // CSRF 중지
-                .ignoringRequestMatchers("/h2-console/**")
-                .disable();
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/hello").permitAll()
+                )
+                .headers(headers -> headers.frameOptions().disable())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**"));
         return http.build();
     }
 }
