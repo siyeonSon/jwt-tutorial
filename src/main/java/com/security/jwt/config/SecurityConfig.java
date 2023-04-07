@@ -20,11 +20,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/hello").permitAll()
+                        .requestMatchers("/**").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .headers(headers -> headers.frameOptions().disable())
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**"));
+                        .ignoringRequestMatchers("/h2-console/**")
+                        .disable());
         return http.build();
     }
 }
