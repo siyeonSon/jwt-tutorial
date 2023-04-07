@@ -1,5 +1,4 @@
 spring:
-
   h2:
     console:
       enabled: true
@@ -19,6 +18,11 @@ spring:
         format_sql: true
         show_sql: true
     defer-datasource-initialization: true
+
+jwt:
+  header: Authorization
+  secret: 4oCYaHR0cHM6Ly9naXRodWIuY29tL3NpeWVvblNvbi9qd3QtdHV0b3JpYWzigJkK
+  token-validity-in-seconds: 86400
 
 logging:
   level:
