@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .accessDeniedHandler(jwtAccessDeniedHandler)
                 .and()
 
+                // h2 database 를 위한 설정가
                 .headers(headers -> headers.frameOptions().sameOrigin())
 
                 // security 는 기본적으로 세션을 사용
@@ -55,7 +56,9 @@ public class SecurityConfig {
 
                 // 로그인, 회원가입 API는 토큰이 없는 상태에서 요청이 들어오기 때문에 permitAll 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/api/hello").permitAll()
+                        .requestMatchers("/api/authenticate").permitAll()
+                        .requestMatchers("/api/signup").permitAll()
                         .anyRequest().authenticated()   // 나머지 API 는 모두 인증 필요
                 )
 
