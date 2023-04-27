@@ -9,6 +9,7 @@ import lombok.*;
 @Entity
 @Table(name = "authority")
 @Builder
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Authority {
