@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @RequiredArgsConstructor
@@ -35,27 +36,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         // CSRF 설정 Disable
-        http.csrf().disable()
-
-                // exception handling 할 때 우리가 만든 클래스를 추가
-                .exceptionHandling()
-                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .accessDeniedHandler(jwtAccessDeniedHandler)
-                .and()
-
-                // h2 database 를 위한 설정가
-                .headers(headers -> headers.frameOptions().sameOrigin())
-
-                // security 는 기본적으로 세션을 사용
-                // 여기서는 세션을 사용하지 않기 때문에 세션 설정을 stateless 로 설정
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-
+        http
                 // 로그인, 회원가입 API는 토큰이 없는 상태에서 요청이 들어오기 때문에 permitAll 설정
-                .authorizeHttpRequests(auth -> auth
+                .authorizeRequests(auth -> auth
                         .requestMatchers("/api/hello").permitAll()
                         .requestMatchers("/api/authenticate").permitAll()
                         .requestMatchers("/api/signup").permitAll()
@@ -63,7 +48,24 @@ public class SecurityConfig {
                 )
 
                 // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용
-                .apply(new JwtSecurityConfig(tokenProvider));
+                .apply(new JwtSecurityConfig(tokenProvider))
+                .and()
+
+                // exception handling 할 때 우리가 만든 클래스를 추가
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .and()
+
+                // h2 database 를 위한 설정
+                .headers(headers -> headers.frameOptions().sameOrigin())
+                .csrf().ignoringRequestMatchers(new AntPathRequestMatcher("/h2-console/**"))
+                .and()
+
+                // security 는 기본적으로 세션을 사용
+                // 여기서는 세션을 사용하지 않기 때문에 세션 설정을 stateless 로 설정
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         return http.build();
     }
